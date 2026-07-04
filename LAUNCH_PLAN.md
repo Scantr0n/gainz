@@ -14,11 +14,11 @@ Created 2026-07-04. Target launch: **Monday, August 3, 2026** (~4.5 weeks out).
 
 | # | Chunk | Type | Notes |
 |---|-------|------|-------|
-| 0.1 | Fix dev server port config | Fix | ✅ **Done today** — `vite.config.js` now reads `PORT` env var |
-| 0.2 | Init git + push to GitHub | Move | No `.git` currently exists. I'll `git init`, add `.gitignore`, first commit. **You:** create an empty GitHub repo named `gainz` (or tell me to use `gh repo create`) so I can push. |
-| 0.3 | Build a Settings/Profile page | Build | Doesn't exist yet — right now there's no way to edit name/bodyweight/goal after onboarding, or reset the app. Needed before launch. |
-| 0.4 | Data export/import (JSON backup) | Add | Lives in the new Settings page. Critical since there's no backend — clearing browser data currently means losing everything permanently. |
-| 0.5 | Full bug-bash / edge-case QA pass | Fix | Zero/negative weight & reps, deleting all sets, empty chart states, split-switching while mid-week, etc. |
+| 0.1 | Fix dev server port config | Fix | ✅ **Done 7/4** — `vite.config.js` now reads `PORT` env var |
+| 0.2 | Init git + push to GitHub | Move | ✅ **Done 7/4 (local)** — repo initialized, committing per chunk. ⏳ GitHub push pending: Jack to pick (1) install `gh` CLI or (2) create repo on github.com |
+| 0.3 | Build a Settings/Profile page | Build | ✅ **Done 7/4** — gear icon on Workout header; edit name/bodyweight/goal; two-tap reset |
+| 0.4 | Data export/import (JSON backup) | Add | ✅ **Done 7/4** — export downloads dated JSON; import validates + restores |
+| 0.5 | Full bug-bash / edge-case QA pass | Fix | ✅ **Done 7/4** — fixed UTC "today" bug (evening logs went to tomorrow), photo compression (raw photos overflowed localStorage and silently killed all saves), negative input clamps, lint clean |
 
 ## Phase 1 — Real AI Backend · Mon Jul 6 – Sun Jul 12
 
@@ -32,8 +32,8 @@ Created 2026-07-04. Target launch: **Monday, August 3, 2026** (~4.5 weeks out).
 
 | # | Chunk | Type | Notes |
 |---|-------|------|-------|
-| 2.1 | PWA setup — manifest, service worker, install icons | Build | This is what makes it installable to a phone home screen and feel like a real app without touching an app store. |
-| 2.2 | App icon & branding assets | Build | Favicon, 192/512 app icons, social share (OG) image — I'll generate these with Canva. |
+| 2.1 | PWA setup — manifest, service worker, install icons | Build | ✅ **Done 7/4** — `vite-plugin-pwa` generates the manifest + service worker; branded 192/512/apple-touch icons and matching favicon created (dumbbell glyph on the app's lime-yellow), replacing leftover unrelated template assets. Verified installable via production build: manifest served, SW registered, correct title/theme-color. |
+| 2.2 | App icon & branding assets | Build | Icons done as part of 2.1. Remaining: social share (OG) image for link previews — via Canva. |
 | 2.3 | Rest timer between sets | Add | Small, high-value feature lifters expect. |
 | 2.4 | Warm-up weight calculator | Add | Given a working weight, suggests warm-up set weights. |
 | 2.5 | Polish pass — loading/empty states, transitions | Update | Cosmetic finishing touches across all 6 pages. |
