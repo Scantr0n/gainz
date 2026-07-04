@@ -14,7 +14,7 @@ export default function Onboarding() {
   const [bodyweight, setBodyweight] = useState('')
 
   function finish() {
-    completeOnboarding({ name, bodyweight: Number(bodyweight) || null, goal }, split)
+    completeOnboarding({ name, bodyweight: Math.max(0, Number(bodyweight)) || null, goal }, split)
   }
 
   return (
@@ -116,6 +116,7 @@ export default function Onboarding() {
                 <label className="text-sm text-gray-400 mb-2 block">Bodyweight (lbs)</label>
                 <input
                   type="number"
+                  min="0"
                   placeholder="e.g. 175"
                   value={bodyweight}
                   onChange={e => setBodyweight(e.target.value)}

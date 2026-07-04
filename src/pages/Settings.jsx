@@ -86,9 +86,10 @@ export default function Settings() {
             <input
               type="number"
               inputMode="decimal"
+              min="0"
               placeholder="e.g. 175"
               value={data.profile.bodyweight ?? ''}
-              onChange={e => updateProfile({ bodyweight: Number(e.target.value) || null })}
+              onChange={e => updateProfile({ bodyweight: Math.max(0, Number(e.target.value)) || null })}
               className="w-full bg-white/8 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 outline-none focus:border-[#e8ff5a]/50 text-base"
             />
             <p className="text-xs text-gray-600 mt-2">Used to calculate your strength tiers.</p>

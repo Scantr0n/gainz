@@ -30,7 +30,6 @@ const INJURY_SWAPS = {
 function SplitCard({ splitKey, split, isActive, onSelect }) {
   const [expanded, setExpanded] = useState(false)
   const days = Object.entries(split.days)
-  const workDays = days.filter(([, d]) => d.label !== 'Rest').length
 
   return (
     <div className={`bg-[#161616] rounded-2xl border transition-all ${isActive ? 'border-[#e8ff5a]/50' : 'border-white/8'}`}>

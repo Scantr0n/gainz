@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../store/useStore'
-import { EXERCISES_MAP, DAYS, DAY_SHORT, SPLITS } from '../data/exercises'
-import { Plus, Minus, ChevronLeft, ChevronRight, RefreshCw, Check, Settings as SettingsIcon } from 'lucide-react'
+import { EXERCISES_MAP, DAY_SHORT } from '../data/exercises'
+import { Plus, Minus, ChevronLeft, ChevronRight, RefreshCw, Settings as SettingsIcon } from 'lucide-react'
 
 function getWeekDates(referenceDate, weekOffset = 0) {
   const d = new Date(referenceDate + 'T12:00:00')
@@ -67,6 +67,7 @@ function ExerciseCard({ exerciseId, date, isAlternate, onSwapBack }) {
               <input
                 type="number"
                 inputMode="decimal"
+                min="0"
                 value={set?.weight ?? 0}
                 onChange={e => handleChange(idx, 'weight', Number(e.target.value))}
                 className="bg-[#222] border border-white/8 rounded-xl px-3 py-2 text-center text-[15px] font-semibold text-white w-full outline-none focus:border-[#e8ff5a]/40"
@@ -74,6 +75,7 @@ function ExerciseCard({ exerciseId, date, isAlternate, onSwapBack }) {
               <input
                 type="number"
                 inputMode="numeric"
+                min="0"
                 value={set?.reps ?? 0}
                 onChange={e => handleChange(idx, 'reps', Number(e.target.value))}
                 className="bg-[#222] border border-white/8 rounded-xl px-3 py-2 text-center text-[15px] font-semibold text-white w-full outline-none focus:border-[#e8ff5a]/40"

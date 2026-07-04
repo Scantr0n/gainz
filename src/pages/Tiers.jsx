@@ -1,7 +1,6 @@
 import { useMemo } from 'react'
 import { useStore } from '../store/useStore'
-import { MUSCLE_GROUPS, TIER_CONFIG, EXERCISES, EXERCISES_MAP } from '../data/exercises'
-import { Trophy, ChevronRight } from 'lucide-react'
+import { MUSCLE_GROUPS, TIER_CONFIG, EXERCISES } from '../data/exercises'
 
 const TIER_ORDER = ['elite', 'advanced', 'intermediate', 'novice', 'beginner']
 const TIER_COLORS = {
@@ -44,9 +43,8 @@ function TierBadge({ tier, size = 'md' }) {
 }
 
 function MuscleCard({ muscle }) {
-  const { getMuscleStrengthLevel, getExerciseHistory, data } = useStore()
+  const { getMuscleStrengthLevel, getExerciseHistory } = useStore()
   const tier = getMuscleStrengthLevel(muscle)
-  const tierConfig = tier ? TIER_CONFIG.find(t => t.key === tier) : null
   const tierIndex = tier ? TIER_ORDER.indexOf(tier) : -1
 
   // Find best exercise for this muscle

@@ -99,8 +99,20 @@ export default function Photos() {
     if (!file) return
     const reader = new FileReader()
     reader.onload = (ev) => {
-      addPhoto(ev.target.result, note)
-      setNote('')
+      // Downscale + JPEG-compress before storing: raw phone photos as base64
+      // blow past the ~5MB localStorage quota after just one or two shots.
+      const img = new Image()
+      img.onload = () => {
+        const MAX = 1080
+        const scale = Math.min(1, MAX / Math.max(img.width, img.height))
+        const canvas = document.createElement('canvas')
+        canvas.width = Math.round(img.width * scale)
+        canvas.height = Math.round(img.height * scale)
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height)
+        addPhoto(canvas.toDataURL('image/jpeg', 0.8), note)
+        setNote('')
+      }
+      img.src = ev.target.result
     }
     reader.readAsDataURL(file)
     e.target.value = ''

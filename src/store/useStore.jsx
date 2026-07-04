@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback, createContext, useContext } from 'react'
+/* eslint-disable react-refresh/only-export-components -- store file intentionally exports hooks + provider together */
+import { useState, useCallback, createContext, useContext } from 'react'
 import { EXERCISES_MAP, SPLITS } from '../data/exercises'
 
 const STORAGE_KEY = 'gainz_data'
@@ -10,8 +11,20 @@ function loadData() {
   } catch { return null }
 }
 
+let warnedSaveFailure = false
 function saveData(data) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)) } catch {}
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+    warnedSaveFailure = false
+  } catch (err) {
+    // Usually QuotaExceededError from too many photos. Warn once instead of
+    // silently losing every change from here on.
+    if (!warnedSaveFailure) {
+      warnedSaveFailure = true
+      alert("Gainz couldn't save — browser storage is full. Delete some progress photos (or export a backup first), then try again.")
+    }
+    console.error('Gainz save failed:', err)
+  }
 }
 
 function getDefaultData() {
@@ -46,8 +59,10 @@ export function useWorkoutStore() {
     })
   }, [])
 
-  // Get today's date string YYYY-MM-DD
-  const today = new Date().toISOString().slice(0, 10)
+  // Get today's date string YYYY-MM-DD in the user's local timezone
+  // (toISOString would give the UTC date, which is tomorrow during US evenings)
+  const now = new Date()
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
 
   // Get the active plan's schedule
   const activeSplit = data.customPlan || SPLITS[data.activePlan]
@@ -72,7 +87,7 @@ export function useWorkoutStore() {
       if (!logs[date]) logs[date] = {}
       if (!logs[date][exerciseId]) logs[date][exerciseId] = []
       const sets = [...(logs[date][exerciseId] || [])]
-      sets[setIndex] = { reps: Number(reps), weight: Number(weight) }
+      sets[setIndex] = { reps: Math.max(0, Number(reps) || 0), weight: Math.max(0, Number(weight) || 0) }
       logs[date][exerciseId] = sets
       return { ...prev, logs }
     })
@@ -175,7 +190,7 @@ export function useWorkoutStore() {
   }
 
   function resetApp() {
-    try { localStorage.removeItem(STORAGE_KEY) } catch {}
+    try { localStorage.removeItem(STORAGE_KEY) } catch { /* nothing to clean up */ }
     setData(getDefaultData())
   }
 
