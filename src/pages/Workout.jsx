@@ -1,7 +1,8 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useStore } from '../store/useStore'
 import { EXERCISES_MAP, DAYS, DAY_SHORT, SPLITS } from '../data/exercises'
-import { Plus, Minus, ChevronLeft, ChevronRight, RefreshCw, Check } from 'lucide-react'
+import { Plus, Minus, ChevronLeft, ChevronRight, RefreshCw, Check, Settings as SettingsIcon } from 'lucide-react'
 
 function getWeekDates(referenceDate, weekOffset = 0) {
   const d = new Date(referenceDate + 'T12:00:00')
@@ -193,11 +194,16 @@ export default function Workout() {
             </h1>
             <p className="text-gray-500 text-sm">{dateLabel}</p>
           </div>
-          {!isThisWeek && (
-            <button onClick={goToToday} className="text-xs text-[#e8ff5a] border border-[#e8ff5a]/30 px-3 py-1.5 rounded-full">
-              Today
-            </button>
-          )}
+          <div className="flex items-center gap-2">
+            {!isThisWeek && (
+              <button onClick={goToToday} className="text-xs text-[#e8ff5a] border border-[#e8ff5a]/30 px-3 py-1.5 rounded-full">
+                Today
+              </button>
+            )}
+            <Link to="/settings" className="p-2 -mr-2 text-gray-400 active:text-white">
+              <SettingsIcon size={20} strokeWidth={1.8} />
+            </Link>
+          </div>
         </div>
 
         {/* Week navigation */}

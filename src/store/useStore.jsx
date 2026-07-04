@@ -174,6 +174,21 @@ export function useWorkoutStore() {
     update(prev => ({ ...prev, photos: prev.photos.filter(p => p.id !== id) }))
   }
 
+  function resetApp() {
+    try { localStorage.removeItem(STORAGE_KEY) } catch {}
+    setData(getDefaultData())
+  }
+
+  function importData(imported) {
+    const defaults = getDefaultData()
+    const next = {
+      ...defaults,
+      ...imported,
+      profile: { ...defaults.profile, ...(imported.profile || {}) },
+    }
+    update(next)
+  }
+
   function completeOnboarding(profileData, splitKey) {
     update(prev => ({
       ...prev,
@@ -198,6 +213,8 @@ export function useWorkoutStore() {
     addPhoto,
     removePhoto,
     completeOnboarding,
+    resetApp,
+    importData,
   }
 }
 

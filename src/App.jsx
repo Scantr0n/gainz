@@ -7,6 +7,7 @@ import Progress from './pages/Progress'
 import Tiers from './pages/Tiers'
 import Plan from './pages/Plan'
 import Photos from './pages/Photos'
+import Settings from './pages/Settings'
 
 function AppInner() {
   const { data } = useStore()
@@ -19,6 +20,7 @@ function AppInner() {
         <Route path="/tiers" element={<Tiers />} />
         <Route path="/plan" element={<Plan />} />
         <Route path="/photos" element={<Photos />} />
+        <Route path="/settings" element={<Settings />} />
       </Routes>
       <BottomNav />
     </BrowserRouter>
