@@ -1,13 +1,50 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useStore } from '../store/useStore'
 import { GOALS } from '../data/exercises'
-import { ChevronLeft, Trash2 } from 'lucide-react'
+import { ChevronLeft, Trash2, Download, Upload, Check } from 'lucide-react'
 
 export default function Settings() {
-  const { data, updateProfile, resetApp } = useStore()
+  const { data, updateProfile, resetApp, importData } = useStore()
   const navigate = useNavigate()
   const [confirmReset, setConfirmReset] = useState(false)
+  const [importStatus, setImportStatus] = useState(null) // { ok, message }
+  const [exported, setExported] = useState(false)
+  const fileInputRef = useRef(null)
+
+  function handleExport() {
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `gainz-backup-${new Date().toISOString().slice(0, 10)}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+    setExported(true)
+    setTimeout(() => setExported(false), 3000)
+  }
+
+  function handleImportFile(e) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      try {
+        const parsed = JSON.parse(ev.target.result)
+        if (!parsed || typeof parsed !== 'object' || typeof parsed.profile !== 'object' || typeof parsed.logs !== 'object') {
+          throw new Error('shape')
+        }
+        importData(parsed)
+        const sessions = Object.keys(parsed.logs || {}).length
+        setImportStatus({ ok: true, message: `Backup restored — ${sessions} workout day${sessions === 1 ? '' : 's'}, ${(parsed.photos || []).length} photos.` })
+      } catch {
+        setImportStatus({ ok: false, message: "That file doesn't look like a Gainz backup." })
+      }
+      setTimeout(() => setImportStatus(null), 5000)
+    }
+    reader.readAsText(file)
+  }
 
   function handleReset() {
     if (!confirmReset) {
@@ -84,6 +121,38 @@ export default function Settings() {
             ))}
           </div>
           <p className="text-xs text-gray-600">Your workout split is managed on the Plan tab.</p>
+        </div>
+
+        {/* Data backup */}
+        <div className="bg-[#161616] rounded-2xl p-4 space-y-3">
+          <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Data</div>
+          <button
+            onClick={handleExport}
+            className="w-full py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 bg-[#e8ff5a] text-black active:scale-98 transition-all"
+          >
+            {exported ? <Check size={15} /> : <Download size={15} />}
+            {exported ? 'Backup downloaded' : 'Export backup'}
+          </button>
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="w-full py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 border border-white/15 text-gray-300 active:bg-white/5"
+          >
+            <Upload size={15} />
+            Import backup
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="application/json,.json"
+            onChange={handleImportFile}
+            className="hidden"
+          />
+          {importStatus && (
+            <div className={`text-xs rounded-xl px-3 py-2.5 ${importStatus.ok ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
+              {importStatus.message}
+            </div>
+          )}
+          <p className="text-xs text-gray-600">Your data lives only in this browser. Export a backup before clearing browser data or switching devices. Importing replaces everything currently in the app.</p>
         </div>
 
         {/* Danger zone */}
