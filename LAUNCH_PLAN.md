@@ -34,7 +34,7 @@ Created 2026-07-04. Target launch: **Monday, August 3, 2026** (~4.5 weeks out).
 |---|-------|------|-------|
 | 2.1 | PWA setup — manifest, service worker, install icons | Build | ✅ **Done 7/4** — `vite-plugin-pwa` generates the manifest + service worker; branded 192/512/apple-touch icons and matching favicon created (dumbbell glyph on the app's lime-yellow), replacing leftover unrelated template assets. Verified installable via production build: manifest served, SW registered, correct title/theme-color. |
 | 2.2 | App icon & branding assets | Build | ✅ **Done 7/4** — social share (OG) image generated (1200×630, matches brand); og:/twitter: meta tags wired into index.html; verified image resolves correctly in a production build. |
-| 2.3 | Rest timer between sets | Add | Small, high-value feature lifters expect. |
+| 2.3 | Rest timer between sets | Add | ✅ **Done 7/4** — sticky 90s timer auto-starts whenever a set is logged; +15s/-15s adjust, skip (X), "Rest complete" celebration state with vibration + 15s auto-dismiss. Verified full countdown → complete → skip cycle live. |
 | 2.4 | Warm-up weight calculator | Add | Given a working weight, suggests warm-up set weights. |
 | 2.5 | Polish pass — loading/empty states, transitions | Update | Cosmetic finishing touches across all 6 pages. |
 

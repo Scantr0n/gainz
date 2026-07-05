@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom'
 import { useStore } from '../store/useStore'
 import { EXERCISES_MAP, DAY_SHORT } from '../data/exercises'
 import { Plus, Minus, ChevronLeft, ChevronRight, RefreshCw, Settings as SettingsIcon } from 'lucide-react'
+import RestTimer from '../components/RestTimer'
+
+const REST_SECONDS = 90
 
 function getWeekDates(referenceDate, weekOffset = 0) {
   const d = new Date(referenceDate + 'T12:00:00')
@@ -16,7 +19,7 @@ function getWeekDates(referenceDate, weekOffset = 0) {
   })
 }
 
-function ExerciseCard({ exerciseId, date, isAlternate, onSwapBack }) {
+function ExerciseCard({ exerciseId, date, isAlternate, onSwapBack, onSetLogged }) {
   const { data, logSet, addSet, removeSet } = useStore()
   const ex = EXERCISES_MAP[exerciseId]
   if (!ex) return null
@@ -54,7 +57,7 @@ function ExerciseCard({ exerciseId, date, isAlternate, onSwapBack }) {
       {/* Sets */}
       {sets.length === 0 ? (
         <button
-          onClick={() => { logSet(date, exerciseId, 0, defaultSet.reps, defaultSet.weight) }}
+          onClick={() => { logSet(date, exerciseId, 0, defaultSet.reps, defaultSet.weight); onSetLogged() }}
           className="w-full py-3 border border-dashed border-white/15 rounded-xl text-sm text-gray-500 flex items-center justify-center gap-2"
         >
           <Plus size={14} /> Add first set
@@ -90,7 +93,7 @@ function ExerciseCard({ exerciseId, date, isAlternate, onSwapBack }) {
 
       {sets.length > 0 && (
         <button
-          onClick={() => addSet(date, exerciseId)}
+          onClick={() => { addSet(date, exerciseId); onSetLogged() }}
           className="w-full py-2.5 border border-white/10 rounded-xl text-sm text-gray-400 flex items-center justify-center gap-2 active:bg-white/5"
         >
           <Plus size={14} /> Add Set
@@ -100,7 +103,7 @@ function ExerciseCard({ exerciseId, date, isAlternate, onSwapBack }) {
   )
 }
 
-function DayView({ date, planDay }) {
+function DayView({ date, planDay, onSetLogged }) {
   const [swaps, setSwaps] = useState({}) // exerciseId -> alternateId
 
   const exercises = planDay.exercises || []
@@ -152,6 +155,7 @@ function DayView({ date, planDay }) {
               date={date}
               isAlternate={!!swaps[exId]}
               onSwapBack={() => swapBack(exId)}
+              onSetLogged={onSetLogged}
             />
             <button
               onClick={() => swap(exId)}
@@ -170,6 +174,15 @@ export default function Workout() {
   const { today, getPlanDay, data } = useStore()
   const [weekOffset, setWeekOffset] = useState(0)
   const [selectedDate, setSelectedDate] = useState(today)
+  const [restEndAt, setRestEndAt] = useState(null)
+
+  function startRest() {
+    setRestEndAt(Date.now() + REST_SECONDS * 1000)
+  }
+
+  function adjustRest(deltaSeconds) {
+    setRestEndAt(prev => (prev ? Math.max(Date.now(), prev + deltaSeconds * 1000) : prev))
+  }
 
   const weekDates = getWeekDates(today, weekOffset)
   const isThisWeek = weekOffset === 0
@@ -251,8 +264,15 @@ export default function Workout() {
 
       {/* Day content */}
       <div className="px-4 pt-2">
-        <DayView date={selectedDate} planDay={planDay} />
+        <DayView date={selectedDate} planDay={planDay} onSetLogged={startRest} />
       </div>
+
+      <RestTimer
+        endAt={restEndAt}
+        totalSeconds={REST_SECONDS}
+        onSkip={() => setRestEndAt(null)}
+        onAdjust={adjustRest}
+      />
     </div>
   )
 }
