@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { StoreProvider, useStore } from './store/useStore'
+import { RestTimerProvider, useRestTimer } from './store/useRestTimer'
 import BottomNav from './components/BottomNav'
+import RestTimer from './components/RestTimer'
 import Onboarding from './pages/Onboarding'
 import Workout from './pages/Workout'
 import Progress from './pages/Progress'
@@ -11,6 +13,7 @@ import Settings from './pages/Settings'
 
 function AppInner() {
   const { data } = useStore()
+  const { restEndAt, restSeconds, adjustRest, skipRest } = useRestTimer()
   if (!data.onboarded) return <Onboarding />
   return (
     <BrowserRouter>
@@ -22,6 +25,7 @@ function AppInner() {
         <Route path="/photos" element={<Photos />} />
         <Route path="/settings" element={<Settings />} />
       </Routes>
+      <RestTimer endAt={restEndAt} totalSeconds={restSeconds} onSkip={skipRest} onAdjust={adjustRest} />
       <BottomNav />
     </BrowserRouter>
   )
@@ -30,7 +34,9 @@ function AppInner() {
 export default function App() {
   return (
     <StoreProvider>
-      <AppInner />
+      <RestTimerProvider>
+        <AppInner />
+      </RestTimerProvider>
     </StoreProvider>
   )
 }

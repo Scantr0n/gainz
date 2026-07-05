@@ -3,6 +3,7 @@ import { useStore } from '../store/useStore'
 import { EXERCISES, MUSCLE_GROUPS, EXERCISES_MAP } from '../data/exercises'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { TrendingUp, TrendingDown, Minus, Search } from 'lucide-react'
+import PageContainer from '../components/PageContainer'
 
 const METRICS = [
   { key: 'maxWeight', label: 'Max Weight', unit: 'lbs' },
@@ -53,7 +54,7 @@ export default function Progress() {
   const selectedEx = selectedExId ? EXERCISES_MAP[selectedExId] : null
 
   return (
-    <div className="flex flex-col min-h-screen pb-24">
+    <PageContainer>
       <div className="px-4 pt-14 pb-4">
         <h1 className="text-2xl font-bold">Progress</h1>
         <p className="text-gray-500 text-sm mt-1">Track your gains over time</p>
@@ -193,10 +194,11 @@ export default function Progress() {
       )}
 
       {!selectedExId && (
-        <div className="px-4 py-16 text-center text-gray-600 text-sm">
-          Select an exercise to see your progress chart
+        <div className="px-4 py-16 text-center space-y-3">
+          <div className="text-5xl">📈</div>
+          <div className="text-gray-600 text-sm">Select an exercise to see your progress chart</div>
         </div>
       )}
-    </div>
+    </PageContainer>
   )
 }

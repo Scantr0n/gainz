@@ -1,12 +1,11 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../store/useStore'
+import { useRestTimer } from '../store/useRestTimer'
 import { EXERCISES_MAP, DAY_SHORT } from '../data/exercises'
 import { Plus, Minus, ChevronLeft, ChevronRight, RefreshCw, Settings as SettingsIcon } from 'lucide-react'
-import RestTimer from '../components/RestTimer'
 import WarmupCalculator from '../components/WarmupCalculator'
-
-const REST_SECONDS = 90
+import PageContainer from '../components/PageContainer'
 
 function getWeekDates(referenceDate, weekOffset = 0) {
   const d = new Date(referenceDate + 'T12:00:00')
@@ -176,17 +175,9 @@ function DayView({ date, planDay, onSetLogged }) {
 
 export default function Workout() {
   const { today, getPlanDay, data } = useStore()
+  const { startRest } = useRestTimer()
   const [weekOffset, setWeekOffset] = useState(0)
   const [selectedDate, setSelectedDate] = useState(today)
-  const [restEndAt, setRestEndAt] = useState(null)
-
-  function startRest() {
-    setRestEndAt(Date.now() + REST_SECONDS * 1000)
-  }
-
-  function adjustRest(deltaSeconds) {
-    setRestEndAt(prev => (prev ? Math.max(Date.now(), prev + deltaSeconds * 1000) : prev))
-  }
 
   const weekDates = getWeekDates(today, weekOffset)
   const isThisWeek = weekOffset === 0
@@ -203,7 +194,7 @@ export default function Workout() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen pb-24">
+    <PageContainer>
       {/* Header */}
       <div className="px-4 pt-14 pb-4 bg-[#0a0a0a] sticky top-0 z-10">
         <div className="flex items-center justify-between mb-4">
@@ -268,15 +259,8 @@ export default function Workout() {
 
       {/* Day content */}
       <div className="px-4 pt-2">
-        <DayView date={selectedDate} planDay={planDay} onSetLogged={startRest} />
+        <DayView date={selectedDate} planDay={planDay} onSetLogged={() => startRest(90)} />
       </div>
-
-      <RestTimer
-        endAt={restEndAt}
-        totalSeconds={REST_SECONDS}
-        onSkip={() => setRestEndAt(null)}
-        onAdjust={adjustRest}
-      />
-    </div>
+    </PageContainer>
   )
 }

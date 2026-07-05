@@ -36,7 +36,7 @@ Created 2026-07-04. Target launch: **Monday, August 3, 2026** (~4.5 weeks out).
 | 2.2 | App icon & branding assets | Build | ✅ **Done 7/4** — social share (OG) image generated (1200×630, matches brand); og:/twitter: meta tags wired into index.html; verified image resolves correctly in a production build. |
 | 2.3 | Rest timer between sets | Add | ✅ **Done 7/4** — sticky 90s timer auto-starts whenever a set is logged; +15s/-15s adjust, skip (X), "Rest complete" celebration state with vibration + 15s auto-dismiss. Verified full countdown → complete → skip cycle live. |
 | 2.4 | Warm-up weight calculator | Add | ✅ **Done 7/4** — expandable "Warm-up sets" panel on each non-bodyweight exercise, computed from the heaviest weight already logged that day (50/70/85% × 8/5/3 reps, rounded to 5 lb or 2.5 lb plates depending on load). Verified math and edge cases (zero weight, small dumbbell loads). |
-| 2.5 | Polish pass — loading/empty states, transitions | Update | Cosmetic finishing touches across all 6 pages. |
+| 2.5 | Polish pass — loading/empty states, transitions | Update | ✅ **Done 7/4** — found and fixed a real bug: the rest timer overlapped the last exercise card's content since bottom padding didn't account for its height. Fixed via a shared `PageContainer` used by all 6 pages. Also lifted the rest timer to app-level context so it now survives switching tabs mid-rest (previously died on navigation), removed ~200 lines of dead Vite-template CSS (`App.css`, fully unused), and added an icon to Progress's empty state for consistency with Photos/Tiers. |
 
 ## Phase 3 — Domain, Hosting, Legal · Mon Jul 20 – Sun Jul 26
 

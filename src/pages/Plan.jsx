@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useStore } from '../store/useStore'
 import { SPLITS, GOALS, EXERCISES_MAP } from '../data/exercises'
 import { Sparkles, ChevronDown, ChevronUp, Check, RefreshCw } from 'lucide-react'
+import PageContainer from '../components/PageContainer'
 
 const DAY_COLORS = {
   Push: '#e8ff5a',
@@ -276,7 +277,7 @@ export default function Plan() {
   const { data, setActivePlan } = useStore()
 
   return (
-    <div className="flex flex-col min-h-screen pb-24">
+    <PageContainer>
       <div className="px-4 pt-14 pb-4">
         <h1 className="text-2xl font-bold">Plan</h1>
         <p className="text-gray-500 text-sm mt-1">Your workout split and AI recommendations</p>
@@ -301,6 +302,6 @@ export default function Plan() {
           </div>
         </div>
       </div>
-    </div>
+    </PageContainer>
   )
 }

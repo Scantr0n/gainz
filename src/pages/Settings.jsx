@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useStore } from '../store/useStore'
 import { GOALS } from '../data/exercises'
 import { ChevronLeft, Trash2, Download, Upload, Check } from 'lucide-react'
+import PageContainer from '../components/PageContainer'
 
 export default function Settings() {
   const { data, updateProfile, resetApp, importData } = useStore()
@@ -56,7 +57,7 @@ export default function Settings() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen pb-24">
+    <PageContainer>
       <div className="px-4 pt-14 pb-4 flex items-center gap-2">
         <button onClick={() => navigate(-1)} className="p-1 -ml-1 text-gray-400 active:text-white">
           <ChevronLeft size={24} />
@@ -176,6 +177,6 @@ export default function Settings() {
           Gainz · Track. Progress. Dominate.
         </div>
       </div>
-    </div>
+    </PageContainer>
   )
 }

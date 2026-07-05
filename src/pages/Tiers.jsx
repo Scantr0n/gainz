@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { useStore } from '../store/useStore'
 import { MUSCLE_GROUPS, TIER_CONFIG, EXERCISES } from '../data/exercises'
+import PageContainer from '../components/PageContainer'
 
 const TIER_ORDER = ['elite', 'advanced', 'intermediate', 'novice', 'beginner']
 const TIER_COLORS = {
@@ -133,7 +134,7 @@ export default function Tiers() {
   const hasBodyweight = !!data.profile.bodyweight
 
   return (
-    <div className="flex flex-col min-h-screen pb-24">
+    <PageContainer>
       <div className="px-4 pt-14 pb-4">
         <h1 className="text-2xl font-bold">Strength Tiers</h1>
         <p className="text-gray-500 text-sm mt-1">See where each muscle group ranks</p>
@@ -185,6 +186,6 @@ export default function Tiers() {
           <MuscleCard key={muscle} muscle={muscle} />
         ))}
       </div>
-    </div>
+    </PageContainer>
   )
 }

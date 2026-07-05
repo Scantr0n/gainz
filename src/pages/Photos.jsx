@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import { useStore } from '../store/useStore'
 import { Camera, Trash2, ChevronLeft, ChevronRight, X } from 'lucide-react'
+import PageContainer from '../components/PageContainer'
 
 function PhotoCard({ photo, onDelete, onClick }) {
   const date = new Date(photo.date + 'T12:00:00').toLocaleDateString('en-US', {
@@ -141,7 +142,7 @@ export default function Photos() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen pb-24">
+    <PageContainer>
       <div className="px-4 pt-14 pb-4">
         <div className="flex items-center justify-between">
           <div>
@@ -208,6 +209,6 @@ export default function Photos() {
           ))}
         </div>
       )}
-    </div>
+    </PageContainer>
   )
 }
