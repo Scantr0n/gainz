@@ -4,6 +4,7 @@ import { useStore } from '../store/useStore'
 import { EXERCISES_MAP, DAY_SHORT } from '../data/exercises'
 import { Plus, Minus, ChevronLeft, ChevronRight, RefreshCw, Settings as SettingsIcon } from 'lucide-react'
 import RestTimer from '../components/RestTimer'
+import WarmupCalculator from '../components/WarmupCalculator'
 
 const REST_SECONDS = 90
 
@@ -26,6 +27,7 @@ function ExerciseCard({ exerciseId, date, isAlternate, onSwapBack, onSetLogged }
 
   const sets = data.logs[date]?.[exerciseId] || []
   const defaultSet = sets.length > 0 ? sets[0] : { reps: 10, weight: 0 }
+  const workingWeight = sets.length ? Math.max(...sets.map(s => s?.weight || 0)) : 0
 
   function handleChange(idx, field, val) {
     const current = sets[idx] || { reps: 10, weight: 0 }
@@ -45,6 +47,8 @@ function ExerciseCard({ exerciseId, date, isAlternate, onSwapBack, onSetLogged }
           </button>
         )}
       </div>
+
+      {ex.equipment !== 'Bodyweight' && <WarmupCalculator workingWeight={workingWeight} />}
 
       {/* Set headers */}
       <div className="grid grid-cols-[32px_1fr_1fr_32px] gap-2 text-xs text-gray-500 px-1">

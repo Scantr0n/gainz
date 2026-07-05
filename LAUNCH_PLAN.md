@@ -35,7 +35,7 @@ Created 2026-07-04. Target launch: **Monday, August 3, 2026** (~4.5 weeks out).
 | 2.1 | PWA setup — manifest, service worker, install icons | Build | ✅ **Done 7/4** — `vite-plugin-pwa` generates the manifest + service worker; branded 192/512/apple-touch icons and matching favicon created (dumbbell glyph on the app's lime-yellow), replacing leftover unrelated template assets. Verified installable via production build: manifest served, SW registered, correct title/theme-color. |
 | 2.2 | App icon & branding assets | Build | ✅ **Done 7/4** — social share (OG) image generated (1200×630, matches brand); og:/twitter: meta tags wired into index.html; verified image resolves correctly in a production build. |
 | 2.3 | Rest timer between sets | Add | ✅ **Done 7/4** — sticky 90s timer auto-starts whenever a set is logged; +15s/-15s adjust, skip (X), "Rest complete" celebration state with vibration + 15s auto-dismiss. Verified full countdown → complete → skip cycle live. |
-| 2.4 | Warm-up weight calculator | Add | Given a working weight, suggests warm-up set weights. |
+| 2.4 | Warm-up weight calculator | Add | ✅ **Done 7/4** — expandable "Warm-up sets" panel on each non-bodyweight exercise, computed from the heaviest weight already logged that day (50/70/85% × 8/5/3 reps, rounded to 5 lb or 2.5 lb plates depending on load). Verified math and edge cases (zero weight, small dumbbell loads). |
 | 2.5 | Polish pass — loading/empty states, transitions | Update | Cosmetic finishing touches across all 6 pages. |
 
 ## Phase 3 — Domain, Hosting, Legal · Mon Jul 20 – Sun Jul 26
