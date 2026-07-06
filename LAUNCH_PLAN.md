@@ -15,7 +15,7 @@ Created 2026-07-04. Target launch: **Monday, August 3, 2026** (~4.5 weeks out).
 | # | Chunk | Type | Notes |
 |---|-------|------|-------|
 | 0.1 | Fix dev server port config | Fix | ✅ **Done 7/4** — `vite.config.js` now reads `PORT` env var |
-| 0.2 | Init git + push to GitHub | Move | ✅ **Done 7/4 (local)** — repo initialized, committing per chunk. Decided 7/6: I install `gh` CLI and handle repo creation/push myself. |
+| 0.2 | Init git + push to GitHub | Move | ✅ **Done 7/6** — installed `gh` CLI, authenticated, created [github.com/Scantr0n/gainz](https://github.com/Scantr0n/gainz) (private), pushed all history. |
 | 0.3 | Build a Settings/Profile page | Build | ✅ **Done 7/4** — gear icon on Workout header; edit name/bodyweight/goal; two-tap reset |
 | 0.4 | Data export/import (JSON backup) | Add | ✅ **Done 7/4** — export downloads dated JSON; import validates + restores |
 | 0.5 | Full bug-bash / edge-case QA pass | Fix | ✅ **Done 7/4** — fixed UTC "today" bug (evening logs went to tomorrow), photo compression (raw photos overflowed localStorage and silently killed all saves), negative input clamps, lint clean |
@@ -24,8 +24,8 @@ Created 2026-07-04. Target launch: **Monday, August 3, 2026** (~4.5 weeks out).
 
 | # | Chunk | Type | Notes |
 |---|-------|------|-------|
-| 1.1 | Stand up a minimal serverless API | Build | **Decided 7/6: Netlify Functions**, not Vercel — matches the pattern already built for the sibling Fuel app (`fuel/netlify/functions/claude-proxy.js`), avoiding a second redundant hosting account. Holds the Anthropic API key server-side; this also becomes our hosting choice (see Phase 3). |
-| 1.2 | Replace the fake `setTimeout` recommender with a real Claude call | Upgrade | `Plan.jsx`'s "AI Plan Recommender" is currently hardcoded if/else logic — swap it for a real API call through the new backend, same pattern as the Fuel app. |
+| 1.1 | Stand up a minimal serverless API | Build | ✅ **Done 7/6** — `netlify/functions/claude-proxy.js` + `netlify.toml`, copied from Fuel's exact pattern. Holds the Anthropic API key server-side. |
+| 1.2 | Replace the fake `setTimeout` recommender with a real Claude call | Upgrade | ✅ **Done 7/6** — `Plan.jsx`'s AI recommender now calls Claude for real via `src/utils/api.js` (same local-dev/deployed dual-path pattern as Fuel). Old rule-based logic kept as automatic fallback for demo mode and API failures — verified live: demo-mode badge, and a bad-key request correctly falls back with a visible warning instead of crashing. Added a dev-only API key field to Settings (stored separately from the exportable backup, confirmed it never leaks into exported JSON). No live Claude key available on this machine, so full end-to-end (a real recommendation) is untested until Phase 3 deploy sets `ANTHROPIC_API_KEY` in Netlify. |
 | 1.3 *(stretch)* | AI reasoning for injury substitutions | Upgrade | Optional — same backend endpoint, richer explanations than the current static `INJURY_SWAPS` map. Cut if time-tight. |
 
 ## Phase 2 — Turn It Into an "App" · Mon Jul 13 – Sun Jul 19

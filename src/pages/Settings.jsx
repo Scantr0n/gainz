@@ -2,12 +2,15 @@ import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useStore } from '../store/useStore'
 import { GOALS } from '../data/exercises'
-import { ChevronLeft, Trash2, Download, Upload, Check } from 'lucide-react'
+import { ChevronLeft, Trash2, Download, Upload, Check, KeyRound } from 'lucide-react'
 import PageContainer from '../components/PageContainer'
+import { isLocalDev, getDevApiKey, setDevApiKey } from '../utils/api'
 
 export default function Settings() {
   const { data, updateProfile, resetApp, importData } = useStore()
   const navigate = useNavigate()
+  const [apiKeyInput, setApiKeyInput] = useState(() => getDevApiKey())
+  const [apiKeySaved, setApiKeySaved] = useState(false)
   const [confirmReset, setConfirmReset] = useState(false)
   const [importStatus, setImportStatus] = useState(null) // { ok, message }
   const [exported, setExported] = useState(false)
@@ -45,6 +48,12 @@ export default function Settings() {
       setTimeout(() => setImportStatus(null), 5000)
     }
     reader.readAsText(file)
+  }
+
+  function handleSaveApiKey() {
+    setDevApiKey(apiKeyInput.trim())
+    setApiKeySaved(true)
+    setTimeout(() => setApiKeySaved(false), 2000)
   }
 
   function handleReset() {
@@ -124,6 +133,34 @@ export default function Settings() {
           </div>
           <p className="text-xs text-gray-600">Your workout split is managed on the Plan tab.</p>
         </div>
+
+        {/* Dev-only: local Claude API key for testing the AI recommender before deploy */}
+        {isLocalDev() && (
+          <div className="bg-[#161616] rounded-2xl p-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <KeyRound size={14} className="text-gray-500" />
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Claude API Key (dev only)</div>
+            </div>
+            <p className="text-xs text-gray-600">
+              Needed for the real AI Plan Recommender on this local dev server. Without one, it runs in demo mode with a rule-based recommendation. Stored only in this browser, never included in exported backups. In production this isn't needed — the key lives server-side.
+            </p>
+            <div className="flex gap-2">
+              <input
+                type="password"
+                placeholder="sk-ant-..."
+                value={apiKeyInput}
+                onChange={e => setApiKeyInput(e.target.value)}
+                className="flex-1 min-w-0 bg-white/8 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white placeholder-gray-600 outline-none focus:border-[#e8ff5a]/50"
+              />
+              <button
+                onClick={handleSaveApiKey}
+                className="px-4 rounded-xl text-sm font-semibold bg-white/10 text-white active:bg-white/15 shrink-0"
+              >
+                {apiKeySaved ? <Check size={16} /> : 'Save'}
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Data backup */}
         <div className="bg-[#161616] rounded-2xl p-4 space-y-3">

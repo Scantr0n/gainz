@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useStore } from '../store/useStore'
 import { SPLITS, GOALS, EXERCISES_MAP } from '../data/exercises'
-import { Sparkles, ChevronDown, ChevronUp, Check, RefreshCw } from 'lucide-react'
+import { Sparkles, ChevronDown, ChevronUp, Check, RefreshCw, AlertTriangle } from 'lucide-react'
+import { askClaudeForJSON } from '../utils/api'
 import PageContainer from '../components/PageContainer'
 
 const DAY_COLORS = {
@@ -161,45 +162,81 @@ function InjuryHelper() {
   )
 }
 
+// Rule-based fallback used when no Claude API access is available (local dev
+// with no key pasted in Settings, or the live API call fails) — keeps the
+// feature usable instead of just erroring out.
+function getMockRecommendation(goal) {
+  if (goal === 'bulk' || goal === 'build-muscle') {
+    return {
+      split: 'push-pull-legs',
+      reason: 'Push/Pull/Legs maximizes weekly volume per muscle group (each hit twice a week), which is optimal for hypertrophy and muscle growth.',
+      tips: ['Aim for 6-12 rep range', 'Progressive overload every week', 'Eat in a caloric surplus'],
+    }
+  }
+  if (goal === 'strength') {
+    return {
+      split: 'upper-lower',
+      reason: 'Upper/Lower splits let you hit compound lifts frequently with enough rest for nervous system recovery — ideal for strength gains.',
+      tips: ['Focus on 3-6 rep range for compounds', 'Rest 3-5 min between heavy sets', 'Prioritize bench, squat, deadlift'],
+    }
+  }
+  if (goal === 'lose-fat') {
+    return {
+      split: 'full-body',
+      reason: 'Full body training 3x/week burns more calories per session and maintains muscle while in a deficit.',
+      tips: ['Keep rest periods short (60-90s)', 'Add cardio on off days', 'Eat at a ~300-500 calorie deficit'],
+    }
+  }
+  return {
+    split: 'upper-lower',
+    reason: 'Upper/Lower is the most balanced split — great frequency, good volume, and manageable weekly commitment.',
+    tips: ['Stay consistent 4 days/week', 'Progressive overload even at maintenance', 'Prioritize sleep and recovery'],
+  }
+}
+
+function buildRecommendationPrompt(goal, goalLabel) {
+  const splitList = Object.entries(SPLITS)
+    .map(([key, s]) => `- "${key}": ${s.name} — ${s.description}`)
+    .join('\n')
+  return `You are a strength coach. A lifter's goal is "${goalLabel}". Recommend the single best workout split for them from this exact list (use the quoted key verbatim):
+${splitList}
+
+Return ONLY valid JSON in this shape, no other text:
+{"split":"<one of the keys above>","reason":"1-2 sentence explanation tailored to their goal","tips":["tip 1","tip 2","tip 3"]}`
+}
+
 function AIPlanner() {
   const { data, setActivePlan } = useStore()
   const [generating, setGenerating] = useState(false)
   const [recommendation, setRecommendation] = useState(null)
+  const [isDemo, setIsDemo] = useState(false)
+  const [error, setError] = useState(null)
 
-  function generateRecommendation() {
+  async function generateRecommendation() {
     setGenerating(true)
-    // AI-style recommendation logic based on goal
-    setTimeout(() => {
-      const goal = data.profile.goal
-      let rec
-      if (goal === 'bulk' || goal === 'build-muscle') {
-        rec = {
-          split: 'push-pull-legs',
-          reason: 'Push/Pull/Legs maximizes weekly volume per muscle group (each hit twice a week), which is optimal for hypertrophy and muscle growth.',
-          tips: ['Aim for 6-12 rep range', 'Progressive overload every week', 'Eat in a caloric surplus']
-        }
-      } else if (goal === 'strength') {
-        rec = {
-          split: 'upper-lower',
-          reason: 'Upper/Lower splits let you hit compound lifts frequently with enough rest for nervous system recovery — ideal for strength gains.',
-          tips: ['Focus on 3-6 rep range for compounds', 'Rest 3-5 min between heavy sets', 'Prioritize bench, squat, deadlift']
-        }
-      } else if (goal === 'lose-fat') {
-        rec = {
-          split: 'full-body',
-          reason: 'Full body training 3x/week burns more calories per session and maintains muscle while in a deficit.',
-          tips: ['Keep rest periods short (60-90s)', 'Add cardio on off days', 'Eat at a ~300-500 calorie deficit']
-        }
+    setError(null)
+    const goal = data.profile.goal
+    const goalLabel = GOALS.find(g => g.id === goal)?.label || 'general fitness'
+    try {
+      const result = await askClaudeForJSON(buildRecommendationPrompt(goal, goalLabel))
+      if (result.demo) {
+        setRecommendation(getMockRecommendation(goal))
+        setIsDemo(true)
+      } else if (SPLITS[result.split] && result.reason && Array.isArray(result.tips)) {
+        setRecommendation(result)
+        setIsDemo(false)
       } else {
-        rec = {
-          split: 'upper-lower',
-          reason: 'Upper/Lower is the most balanced split — great frequency, good volume, and manageable weekly commitment.',
-          tips: ['Stay consistent 4 days/week', 'Progressive overload even at maintenance', 'Prioritize sleep and recovery']
-        }
+        throw new Error('Unexpected response shape')
       }
-      setRecommendation(rec)
+    } catch {
+      // Claude call failed (bad/missing key, network, rate limit, etc.) —
+      // fall back to the rule-based recommendation rather than a dead end.
+      setRecommendation(getMockRecommendation(goal))
+      setIsDemo(true)
+      setError("Couldn't reach the AI right now — showing a rule-based recommendation instead.")
+    } finally {
       setGenerating(false)
-    }, 1200)
+    }
   }
 
   const goalLabel = GOALS.find(g => g.id === data.profile.goal)?.label || 'your goal'
@@ -236,9 +273,20 @@ function AIPlanner() {
         </button>
       ) : (
         <div className="space-y-4">
+          {error && (
+            <div className="flex items-start gap-2 text-xs text-amber-400 bg-amber-400/10 rounded-xl p-2.5">
+              <AlertTriangle size={13} className="mt-0.5 shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
           <div className="bg-white/5 rounded-xl p-3 space-y-2">
-            <div className="text-sm font-semibold text-[#e8ff5a]">
-              Recommended: {SPLITS[recommendation.split].name}
+            <div className="flex items-center justify-between gap-2">
+              <div className="text-sm font-semibold text-[#e8ff5a]">
+                Recommended: {SPLITS[recommendation.split].name}
+              </div>
+              {isDemo && (
+                <span className="text-[10px] font-medium text-gray-500 bg-white/5 px-2 py-0.5 rounded-full shrink-0">Demo mode</span>
+              )}
             </div>
             <p className="text-sm text-gray-400 leading-relaxed">{recommendation.reason}</p>
           </div>
