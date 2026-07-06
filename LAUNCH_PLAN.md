@@ -15,7 +15,7 @@ Created 2026-07-04. Target launch: **Monday, August 3, 2026** (~4.5 weeks out).
 | # | Chunk | Type | Notes |
 |---|-------|------|-------|
 | 0.1 | Fix dev server port config | Fix | ✅ **Done 7/4** — `vite.config.js` now reads `PORT` env var |
-| 0.2 | Init git + push to GitHub | Move | ✅ **Done 7/4 (local)** — repo initialized, committing per chunk. ⏳ GitHub push pending: Jack to pick (1) install `gh` CLI or (2) create repo on github.com |
+| 0.2 | Init git + push to GitHub | Move | ✅ **Done 7/4 (local)** — repo initialized, committing per chunk. Decided 7/6: I install `gh` CLI and handle repo creation/push myself. |
 | 0.3 | Build a Settings/Profile page | Build | ✅ **Done 7/4** — gear icon on Workout header; edit name/bodyweight/goal; two-tap reset |
 | 0.4 | Data export/import (JSON backup) | Add | ✅ **Done 7/4** — export downloads dated JSON; import validates + restores |
 | 0.5 | Full bug-bash / edge-case QA pass | Fix | ✅ **Done 7/4** — fixed UTC "today" bug (evening logs went to tomorrow), photo compression (raw photos overflowed localStorage and silently killed all saves), negative input clamps, lint clean |
@@ -24,7 +24,7 @@ Created 2026-07-04. Target launch: **Monday, August 3, 2026** (~4.5 weeks out).
 
 | # | Chunk | Type | Notes |
 |---|-------|------|-------|
-| 1.1 | Stand up a minimal serverless API | Build | A Vercel Function (or small Node endpoint) to hold the Anthropic API key server-side — it can't live in client code. This also becomes our hosting choice (see Phase 3). |
+| 1.1 | Stand up a minimal serverless API | Build | **Decided 7/6: Netlify Functions**, not Vercel — matches the pattern already built for the sibling Fuel app (`fuel/netlify/functions/claude-proxy.js`), avoiding a second redundant hosting account. Holds the Anthropic API key server-side; this also becomes our hosting choice (see Phase 3). |
 | 1.2 | Replace the fake `setTimeout` recommender with a real Claude call | Upgrade | `Plan.jsx`'s "AI Plan Recommender" is currently hardcoded if/else logic — swap it for a real API call through the new backend, same pattern as the Fuel app. |
 | 1.3 *(stretch)* | AI reasoning for injury substitutions | Upgrade | Optional — same backend endpoint, richer explanations than the current static `INJURY_SWAPS` map. Cut if time-tight. |
 
@@ -43,9 +43,9 @@ Created 2026-07-04. Target launch: **Monday, August 3, 2026** (~4.5 weeks out).
 | # | Chunk | Type | Notes |
 |---|-------|------|-------|
 | 3.1 | **Buy a domain** | **Buy (you)** | e.g. `gainzapp.com` / `trygainz.com` — roughly $12–20/yr. I can shortlist name/availability options when we get here; you complete the purchase. |
-| 3.2 | Deploy to Vercel + connect domain + SSL | Move/Build | Free tier covers this comfortably at launch traffic levels. |
+| 3.2 | Deploy to Netlify + connect domain + SSL | Move/Build | Free tier covers this comfortably at launch traffic levels; matches Fuel's existing setup. |
 | 3.3 | Privacy Policy + Terms of Use pages | Add | Needed because profile/goal data now leaves the device to hit the Claude API. I'll draft plain-language versions — have a lawyer glance at them before you scale this into a real business. |
-| 3.4 | Lightweight, privacy-friendly analytics | Add | Vercel Analytics or Plausible so you can see launch-day traffic. |
+| 3.4 | Lightweight, privacy-friendly analytics | Add | Netlify Analytics or Plausible so you can see launch-day traffic. |
 
 ## Phase 4 — QA & Beta · Mon Jul 27 – Sun Aug 2
 
@@ -75,9 +75,9 @@ Created 2026-07-04. Target launch: **Monday, August 3, 2026** (~4.5 weeks out).
 | Item | Cost |
 |---|---|
 | Domain | ~$12–20/yr |
-| Hosting (Vercel free tier) | $0 |
+| Hosting (Netlify free tier) | $0 |
 | Claude API usage (recommender calls) | Usage-based, likely a few $/month at low volume |
-| Analytics (optional, Plausible) | $0 (Vercel Analytics) or ~$9/mo (Plausible) |
+| Analytics (optional, Plausible) | $0 (Netlify Analytics) or ~$9/mo (Plausible) |
 | **Total to launch** | **~$15–30** |
 
 Native app store costs ($99/yr + $25) are deferred to Phase 6 and not required for the Aug 3 launch.

@@ -1,16 +1,17 @@
-# React + Vite
+# Gainz
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Track. Progress. Dominate.
 
-Currently, two official plugins are available:
+A workout tracker: log lifts, follow a split, chart your progress, and track strength tiers against your bodyweight. React + Vite, installable as a PWA. Data is stored locally in the browser (export/import a JSON backup anytime from Settings).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+See [`LAUNCH_PLAN.md`](./LAUNCH_PLAN.md) for the full build/launch roadmap.
 
-## React Compiler
+## Development
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+npm install
+npm run dev      # dev server
+npm run build    # production build
+npm run preview  # serve the production build locally
+npm run lint
+```
