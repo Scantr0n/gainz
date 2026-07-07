@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useStore } from '../store/useStore'
-import { SPLITS, GOALS, EXERCISES_MAP } from '../data/exercises'
+import { SPLITS, GOALS, EXERCISES, EXERCISES_MAP } from '../data/exercises'
 import { Sparkles, ChevronDown, ChevronUp, Check, RefreshCw, AlertTriangle } from 'lucide-react'
 import { askClaudeForJSON } from '../utils/api'
 import PageContainer from '../components/PageContainer'
@@ -108,8 +108,68 @@ function SplitCard({ splitKey, split, isActive, onSelect }) {
   )
 }
 
+// Rule-based fallback for injury guidance — same role as getMockRecommendation
+// below: used in demo mode (no API key) and if the live call fails.
+function getMockInjuryGuidance(injury) {
+  const ids = INJURY_SWAPS[injury] || []
+  return {
+    avoid: ids.map(id => ({
+      exercise: id,
+      reason: null,
+      alternatives: (EXERCISES_MAP[id]?.alternatives || []).slice(0, 2),
+    })),
+  }
+}
+
+function buildInjuryPrompt(injury) {
+  const catalog = EXERCISES.map(e => `- "${e.id}": ${e.name} (${e.muscle}, ${e.equipment})`).join('\n')
+  return `A lifter has a "${injury}" injury or is experiencing pain there. From this exact exercise catalog (use the quoted id verbatim, never invent an id), identify which exercises they should avoid or modify, and a safer alternative for each from the same catalog.
+
+${catalog}
+
+Return ONLY valid JSON in this shape, no other text:
+{"avoid":[{"exercise":"<id from catalog>","reason":"1 short clause on why it stresses this injury","alternatives":["<id>","<id>"]}],"note":"1 short sentence of general caution, e.g. suggesting they stop if it hurts or see a professional for anything serious"}
+Limit to the 4-8 most relevant exercises. Only use exercise ids that appear in the catalog above.`
+}
+
 function InjuryHelper() {
   const [selectedInjury, setSelectedInjury] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [guidance, setGuidance] = useState(null)
+  const [isDemo, setIsDemo] = useState(false)
+  const [error, setError] = useState(null)
+
+  async function selectInjury(injury) {
+    if (selectedInjury === injury) {
+      setSelectedInjury(null)
+      setGuidance(null)
+      return
+    }
+    setSelectedInjury(injury)
+    setGuidance(null)
+    setError(null)
+    setLoading(true)
+    try {
+      const result = await askClaudeForJSON(buildInjuryPrompt(injury), 800)
+      if (result.demo) {
+        setGuidance(getMockInjuryGuidance(injury))
+        setIsDemo(true)
+      } else if (Array.isArray(result.avoid)) {
+        const cleaned = result.avoid.filter(a => EXERCISES_MAP[a.exercise])
+        if (cleaned.length === 0) throw new Error('No valid exercises in response')
+        setGuidance({ avoid: cleaned, note: result.note })
+        setIsDemo(false)
+      } else {
+        throw new Error('Unexpected response shape')
+      }
+    } catch {
+      setGuidance(getMockInjuryGuidance(injury))
+      setIsDemo(true)
+      setError("Couldn't reach the AI right now — showing general guidance instead.")
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="bg-[#161616] rounded-2xl p-4 space-y-3">
@@ -124,7 +184,7 @@ function InjuryHelper() {
         {Object.keys(INJURY_SWAPS).map(injury => (
           <button
             key={injury}
-            onClick={() => setSelectedInjury(selectedInjury === injury ? null : injury)}
+            onClick={() => selectInjury(injury)}
             className={`px-3 py-1.5 rounded-xl text-sm font-medium capitalize transition-all ${
               selectedInjury === injury ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-white/8 text-gray-400 border border-white/8'
             }`}
@@ -133,19 +193,39 @@ function InjuryHelper() {
           </button>
         ))}
       </div>
-      {selectedInjury && (
-        <div className="border-t border-white/8 pt-3">
-          <div className="text-sm text-gray-400 mb-2">Avoid these with a <span className="text-red-400 font-medium">{selectedInjury}</span> injury:</div>
+
+      {selectedInjury && loading && (
+        <div className="border-t border-white/8 pt-3 flex items-center gap-2 text-sm text-gray-500">
+          <RefreshCw size={14} className="animate-spin" />
+          Checking exercises for your {selectedInjury}...
+        </div>
+      )}
+
+      {selectedInjury && !loading && guidance && (
+        <div className="border-t border-white/8 pt-3 space-y-3">
+          {error && (
+            <div className="flex items-start gap-2 text-xs text-amber-400 bg-amber-400/10 rounded-xl p-2.5">
+              <AlertTriangle size={13} className="mt-0.5 shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
+          <div className="flex items-center justify-between gap-2">
+            <div className="text-sm text-gray-400">Avoid these with a <span className="text-red-400 font-medium">{selectedInjury}</span> injury:</div>
+            {isDemo && (
+              <span className="text-[10px] font-medium text-gray-500 bg-white/5 px-2 py-0.5 rounded-full shrink-0">Demo mode</span>
+            )}
+          </div>
           <div className="space-y-1.5">
-            {INJURY_SWAPS[selectedInjury].map(id => {
+            {guidance.avoid.map(({ exercise: id, reason, alternatives }) => {
               const ex = EXERCISES_MAP[id]
               if (!ex) return null
-              const alts = ex.alternatives?.slice(0, 2) || []
+              const alts = (alternatives || []).filter(a => EXERCISES_MAP[a]).slice(0, 2)
               return (
                 <div key={id} className="flex items-start gap-2 text-sm">
                   <span className="text-red-400 mt-0.5 shrink-0">✗</span>
                   <div>
                     <span className="text-white">{ex.name}</span>
+                    {reason && <span className="text-gray-500"> — {reason}</span>}
                     {alts.length > 0 && (
                       <span className="text-gray-500"> → swap for <span className="text-green-400">
                         {alts.map(a => EXERCISES_MAP[a]?.name).filter(Boolean).join(' or ')}
@@ -156,6 +236,10 @@ function InjuryHelper() {
               )
             })}
           </div>
+          {guidance.note && (
+            <p className="text-xs text-gray-600 italic">{guidance.note}</p>
+          )}
+          <p className="text-xs text-gray-600">Not medical advice. Stop if something hurts, and see a professional for anything more than mild discomfort.</p>
         </div>
       )}
     </div>
