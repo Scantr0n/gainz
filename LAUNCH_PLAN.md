@@ -47,6 +47,27 @@ Created 2026-07-04. Target launch: **Monday, August 3, 2026** (~4.5 weeks out).
 | 3.3 | Privacy Policy + Terms of Use pages | Add | Needed because profile/goal data now leaves the device to hit the Claude API. I'll draft plain-language versions — have a lawyer glance at them before you scale this into a real business. |
 | 3.4 | Lightweight, privacy-friendly analytics | Add | Netlify Analytics or Plausible so you can see launch-day traffic. |
 
+### Session plan for whenever you're next free (est. ~45–60 min of your active time, spread out)
+
+**Step 1 — Domain brainstorm (~15 min, needs you)**
+I can't check live domain availability myself (no registrar access), so this is a quick back-and-forth: I'll propose a shortlist of names on-brand with Gainz (yellow/dumbbell/"Track. Progress. Dominate." energy — think `gainzapp.com`, `trygainz.com`, `getgainz.app`, `usegainz.com`), you check availability + price on a registrar (Namecheap, Cloudflare, or Google Domains-successor Squarespace Domains — Cloudflare has no markup on renewals, worth a look), and buy the one you like. Takes 5 minutes once you've picked a name.
+
+**Step 2 — Netlify account (~5 min, needs you)**
+Sign up at netlify.com — recommend "Sign up with GitHub" since the repo's already there, it's the smoothest path to Step 3. When it asks for repo access, you can scope it to just the `gainz` repo rather than all of GitHub if you'd rather not grant blanket access.
+
+**Step 3 — Deploy (mostly me, ~15–20 min working together)**
+Once you have a Netlify account: "Add new site" → "Import an existing project" → connect GitHub → pick `Scantr0n/gainz`. Netlify auto-detects the build settings from `netlify.toml` (already in the repo: build command `npm run build`, publish directory `dist`, functions folder `netlify/functions`) — I'll double check the first deploy succeeds and the app actually loads. Then:
+- You paste your Anthropic API key into Netlify's dashboard (Site settings → Environment variables → `ANTHROPIC_API_KEY`) — this is the moment the AI Plan Recommender goes live for real, first true end-to-end test of Phase 1's work
+- Once the domain is bought (Step 1), we connect it in Netlify's Domain settings — SSL is automatic (Netlify provisions it via Let's Encrypt, no cost, no action needed beyond clicking connect)
+
+**Step 4 — Legal pages (~fully me, no action from you)**
+I draft Privacy Policy + Terms of Use once we're deploying, since that's when I know the real domain/contact info to put in them.
+
+**Step 5 — Analytics (fully me, no action from you)**
+Wire up Netlify Analytics or Plausible so you can see traffic once live.
+
+*If you only have time for Steps 1–2 (picking + buying a domain, signing up for Netlify), that's enough to unblock me — I can do Steps 3–5 solo once those two things exist.*
+
 ## Phase 4 — QA & Beta · Mon Jul 27 – Sun Aug 2
 
 | # | Chunk | Type | Notes |
