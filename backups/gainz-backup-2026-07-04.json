@@ -1,0 +1,13 @@
+{
+  "profile": {
+    "name": "Jack",
+    "bodyweight": 175,
+    "goal": "build-muscle",
+    "split": "push-pull-legs"
+  },
+  "logs": {},
+  "activePlan": "push-pull-legs",
+  "customPlan": null,
+  "photos": [],
+  "onboarded": true
+}
